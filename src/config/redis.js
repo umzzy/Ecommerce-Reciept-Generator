@@ -1,7 +1,7 @@
 const IORedis = require("ioredis");
 
 const logger = require("../utils/logger");
-const { redisHost, redisPort } = require("./keys");
+const { redisUrl} = require("./keys");
 
 const connection = new IORedis({
   url: redisUrl,
