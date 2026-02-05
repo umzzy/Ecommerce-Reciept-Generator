@@ -3,8 +3,7 @@ const IORedis = require("ioredis");
 const logger = require("../utils/logger");
 const { redisUrl} = require("./keys");
 
-const connection = new IORedis({
-  url: redisUrl,
+const connection = new IORedis(redisUrl,{
   maxRetriesPerRequest: null,
 });
 
