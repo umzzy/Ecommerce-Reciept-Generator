@@ -19,6 +19,7 @@ const {
   SMTP_USER,
   SMTP_PASS,
   RESEND_API_KEY,
+  RESEND_FROM,
   MAIL_FROM,
   STORE_NAME,
   STORE_ADDRESS,
@@ -47,6 +48,7 @@ module.exports = {
   mongodbUri: MONGODB_URI,
   redisUrl: REDIS_URL,
   resendApiKey: RESEND_API_KEY,
+  resendFrom: RESEND_FROM,
   receiptSignedUrlTtlSec: RECEIPT_SIGNED_URL_TTL_SEC,
   publicBaseUrl: PUBLIC_BASE_URL,
   smtp: {

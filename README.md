@@ -32,7 +32,9 @@ Commonly used variables (see `src/config/keys.js` for the full list):
 - `WEBHOOK_SECRET` (recommended): shared secret used to verify `x-webhook-signature` on incoming webhooks
 - `WEBHOOK_RECEIVER_URL` (optional): default receiver URL used by the mock sender
 - Cloudinary (optional): `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
-- SMTP (required to send emails): `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (optional `MAIL_FROM`)
+- Email sending (choose one):
+  - Resend API (recommended): `RESEND_API_KEY` (and `RESEND_FROM` or `MAIL_FROM`)
+  - SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (optional `MAIL_FROM`)
 - Admin auth (optional): `ADMIN_API_KEY` (send via `Authorization: Bearer <key>` or `x-admin-key: <key>`)
 - Signed receipt links (optional): `RECEIPT_DOWNLOAD_SECRET`, `RECEIPT_SIGNED_URL_TTL_SEC`, `PUBLIC_BASE_URL`
 
