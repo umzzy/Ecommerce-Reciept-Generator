@@ -4,8 +4,7 @@ const logger = require("../utils/logger");
 const { redisHost, redisPort } = require("./keys");
 
 const connection = new IORedis({
-  host: redisHost,
-  port: redisPort,
+  url: redisUrl,
   maxRetriesPerRequest: null,
 });
 
