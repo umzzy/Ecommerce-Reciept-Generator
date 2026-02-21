@@ -13,12 +13,18 @@ const logger = require("../utils/logger");
 const Order = require("../models/order");
 const Webhook = require("../models/webhook");
 
-const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
-const sample = (items) => items[randInt(0, items.length - 1)];
-
 const roundMoney = (value) =>
   Number(Number.isFinite(value) ? value.toFixed(2) : "0");
+
+const DEFAULT_CUSTOMER = {
+  name: "Test Customer",
+  email: "test.customer@book.com",
+};
+
+const DEFAULT_ORDER_ITEMS = [
+  { name: "Wireless Mouse", quantity: 1, price: 15.99 },
+  { name: "USB-C Cable", quantity: 2, price: 6.5 },
+];
 
 const buildSignatureHeader = ({ secret, timestamp, rawBody }) => {
   if (!secret) return undefined;
@@ -30,64 +36,6 @@ const buildSignatureHeader = ({ secret, timestamp, rawBody }) => {
   return `t=${timestamp},v1=${digest}`;
 };
 
-const generateRandomCustomer = () => {
-  const firstNames = [
-    "Amina",
-    "Chinedu",
-    "Fatima",
-    "Kemi",
-    "Ibrahim",
-    "Ada",
-    "Tunde",
-    "Zainab",
-    "Emeka",
-    "Sade",
-  ];
-  const lastNames = [
-    "Okafor",
-    "Balogun",
-    "Okoye",
-    "Adeyemi",
-    "Mohammed",
-    "Ibrahim",
-    "Okonkwo",
-    "Ogunleye",
-    "Abubakar",
-    "Afolayan",
-  ];
-  const first = sample(firstNames);
-  const last = sample(lastNames);
-  const name = `${first} ${last}`;
-  const email = `${first}.${last}${randInt(10, 999)}@book.com`
-    .toLowerCase()
-    .replace(/\s+/g, "");
-  return { name, email };
-};
-
-const generateRandomItems = () => {
-  const products = [
-    "Wireless Mouse",
-    "USB-C Cable",
-    "Bluetooth Speaker",
-    "Mechanical Keyboard",
-    "Phone Case",
-    "Laptop Stand",
-    "Smart Watch Strap",
-    "Portable Charger",
-    "HDMI Adapter",
-    "Noise Cancelling Earbuds",
-  ];
-  const count = randInt(1, 4);
-  const items = [];
-  for (let i = 0; i < count; i += 1) {
-    const name = sample(products);
-    const quantity = randInt(1, 99);
-    const price = roundMoney(randInt(500, 50000) / 100);
-    items.push({ name, quantity, price });
-  }
-  return items;
-};
-
 const buildOrderDoc = (overrides) => {
   const fallbackStore = {
     storeName: storeName || "My E-commerce Store",
@@ -95,11 +43,10 @@ const buildOrderDoc = (overrides) => {
     storePhone: storePhone || "+000-000-0000",
   };
 
-  const customer = generateRandomCustomer();
   const orderItems =
     Array.isArray(overrides?.items) && overrides.items.length > 0
       ? overrides.items
-      : generateRandomItems();
+      : DEFAULT_ORDER_ITEMS.map((item) => ({ ...item }));
   const quantity = orderItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = roundMoney(
     orderItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
@@ -107,15 +54,13 @@ const buildOrderDoc = (overrides) => {
   const unitPrice = quantity > 0 ? roundMoney(totalPrice / quantity) : 0;
 
   return {
-    customerName: overrides?.customerName || customer.name,
-    customerEmail: overrides?.customerEmail || customer.email,
+    customerName: overrides?.customerName || DEFAULT_CUSTOMER.name,
+    customerEmail: overrides?.customerEmail || DEFAULT_CUSTOMER.email,
     orderItems,
     quantity,
     unitPrice,
     totalPrice,
-    paymentMethod:
-      overrides?.paymentMethod ||
-      sample(["Credit Card", "PayPal", "Bank Transfer"]),
+    paymentMethod: overrides?.paymentMethod || "Credit Card",
     status: "Completed",
     ...fallbackStore,
   };
