@@ -50,13 +50,14 @@ Commonly used variables (see `src/config/keys.js` for the full list):
 
 - `POST /api/sender/order-paid`
   - Generates a random order + payment payload and sends it to the configured receiver URL.
+  - Required body fields:
+    - `customerName`, `customerEmail`
+    - `items`: array of `{ name, quantity, price }`
   - Optional body fields:
     - `receiverUrl` (URL): override the receiver endpoint for this call
     - `eventType` (enum): `order.pending`, `order.failed`, `order.paid` (default: `order.paid`)
     - `currency` (3-letter, auto-uppercased; default: `NGN`)
-    - `customerName`, `customerEmail`
     - `paymentMethod` (enum): `Credit Card`, `PayPal`, `Bank Transfer`
-    - `items`: array of `{ name, quantity, price }`
     - `dryRun` (boolean; default: `false`) skips the HTTP dispatch but still creates the Order + payload
 
 - `POST /api/sender/resend/:eventId`

@@ -16,16 +16,6 @@ const Webhook = require("../models/webhook");
 const roundMoney = (value) =>
   Number(Number.isFinite(value) ? value.toFixed(2) : "0");
 
-const DEFAULT_CUSTOMER = {
-  name: "Test Customer",
-  email: "test.customer@book.com",
-};
-
-const DEFAULT_ORDER_ITEMS = [
-  { name: "Wireless Mouse", quantity: 1, price: 15.99 },
-  { name: "USB-C Cable", quantity: 2, price: 6.5 },
-];
-
 const buildSignatureHeader = ({ secret, timestamp, rawBody }) => {
   if (!secret) return undefined;
   const payload = `${timestamp}.${rawBody}`;
@@ -43,10 +33,7 @@ const buildOrderDoc = (overrides) => {
     storePhone: storePhone || "+000-000-0000",
   };
 
-  const orderItems =
-    Array.isArray(overrides?.items) && overrides.items.length > 0
-      ? overrides.items
-      : DEFAULT_ORDER_ITEMS.map((item) => ({ ...item }));
+  const orderItems = (overrides?.items ?? []).map((item) => ({ ...item }));
   const quantity = orderItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = roundMoney(
     orderItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
@@ -54,8 +41,8 @@ const buildOrderDoc = (overrides) => {
   const unitPrice = quantity > 0 ? roundMoney(totalPrice / quantity) : 0;
 
   return {
-    customerName: overrides?.customerName || DEFAULT_CUSTOMER.name,
-    customerEmail: overrides?.customerEmail || DEFAULT_CUSTOMER.email,
+    customerName: overrides?.customerName,
+    customerEmail: overrides?.customerEmail,
     orderItems,
     quantity,
     unitPrice,
