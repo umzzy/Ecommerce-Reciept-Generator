@@ -20,10 +20,10 @@ const sendMockOrderPaidSchema = z
       .length(3)
       .optional()
       .default("NGN"),
-    customerName: z.string().trim().min(1),
-    customerEmail: z.string().trim().email(),
+    customerName: z.string().trim().min(1).optional(),
+    customerEmail: z.string().trim().email().optional(),
     paymentMethod: paymentMethodSchema.optional(),
-    items: z.array(orderItemSchema).min(1),
+    items: z.array(orderItemSchema).min(1).optional(),
     dryRun: z.boolean().optional().default(false),
   })
   .strict();
