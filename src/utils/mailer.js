@@ -2,8 +2,7 @@ const nodemailer = require("nodemailer");
 const fs = require("fs/promises");
 const path = require("path");
 
-const { smtp, serviceName, resendApiKey, resendFrom } = require("../config/keys");
-const { isResendConfigured, sendResendEmail } = require("./resendmailer");
+const { smtp, serviceName } = require("../config/keys");
 
 const isSmtpConfigured = () =>
   Boolean(
@@ -183,28 +182,10 @@ const sendReceiptEmail = async ({
     contentType: "application/pdf",
   });
 
-  const smtpFromEmail =
+  const fromEmail =
     (isSmtpConfigured() && (smtp?.mailFrom || smtp?.user)) ||
     `no-reply@${resolvedStoreName.replace(/\s+/g, "").toLowerCase()}.local`;
-  const smtpFrom = smtpFromEmail.includes("<")
-    ? smtpFromEmail
-    : `${resolvedStoreName} <${smtpFromEmail}>`;
-
-  const useResend = isResendConfigured(resendApiKey);
-  let resendFromHeader = null;
-  if (useResend) {
-    const resendFromEmail = String(resendFrom || smtp?.mailFrom || smtp?.user || "").trim();
-    if (!resendFromEmail) {
-      const err = new Error(
-        "Resend is enabled but sender email is missing. Set RESEND_FROM or MAIL_FROM.",
-      );
-      err.code = "RESEND_FROM_MISSING";
-      throw err;
-    }
-    resendFromHeader = resendFromEmail.includes("<")
-      ? resendFromEmail
-      : `${resolvedStoreName} <${resendFromEmail}>`;
-  }
+  const from = fromEmail.includes("<") ? fromEmail : `${resolvedStoreName} <${fromEmail}>`;
 
   const safeStoreName = escapeHtml(resolvedStoreName);
   const safeCustomerName = escapeHtml(customerName || "");
@@ -325,37 +306,13 @@ const sendReceiptEmail = async ({
   `.trim();
 
   const mail = {
-    from: smtpFrom,
+    from,
     to,
     subject,
     text,
     html,
     attachments,
   };
-
-  if (useResend) {
-    const resendMail = {
-      from: resendFromHeader,
-      to,
-      subject,
-      text,
-      html,
-      attachments: [
-        {
-          filename: `${receiptId}.pdf`,
-          content: resolvedPdfBuffer.toString("base64"),
-          content_type: "application/pdf",
-        },
-      ],
-    };
-
-    const info = await sendResendEmail({ apiKey: resendApiKey, mail: resendMail });
-    return {
-      delivered: true,
-      mode: "resend",
-      messageId: info?.id || null,
-    };
-  }
 
   const transport = ensureTransporter();
   const info = await transport.sendMail(mail);
