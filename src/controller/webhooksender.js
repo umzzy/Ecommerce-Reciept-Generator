@@ -146,6 +146,7 @@ const buildWebhookPayload = ({
       id: String(order._id),
       status: order.status,
       items: order.orderItems,
+      // TODO: Plan to remove the quantity and unitPrice fields from the Order model, as they can be derived from orderItems. For now, we include them here to populate the payload.
       quantity: order.quantity,
       unitPrice: order.unitPrice,
       totalPrice: order.totalPrice,
