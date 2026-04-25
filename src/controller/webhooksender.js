@@ -100,6 +100,7 @@ const buildOrderDoc = (overrides) => {
     Array.isArray(overrides?.items) && overrides.items.length > 0
       ? overrides.items
       : generateRandomItems();
+  // TODO: Plan to remove the quantity and unitPrice fields from the Order model, as they can be derived from orderItems. For now, we calculate them here to populate the model.
   const quantity = orderItems.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = roundMoney(
     orderItems.reduce((sum, item) => sum + item.quantity * item.price, 0),
